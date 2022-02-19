@@ -1,281 +1,227 @@
-from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
-                            InlineKeyboardMarkup, InputMediaPhoto, Message)
+import asyncio
+import importlib
+import os
+import re
+import random
 
-from config import MUSIC_BOT_NAME, SUPPORT_CHANNEL, SUPPORT_GROUP
-from Yukki import BOT_USERNAME
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pytgcalls import idle
+from rich.console import Console
+from rich.table import Table
+from youtubesearchpython import VideosSearch
 
+from config import (LOG_GROUP_ID, LOG_SESSION, STRING1, STRING2, STRING3,
+                    STRING4, STRING5)
+from Yukki import (ASS_CLI_1, ASS_CLI_2, ASS_CLI_3, ASS_CLI_4, ASS_CLI_5,
+                   ASSID1, ASSID2, ASSID3, ASSID4, ASSID5, ASSNAME1, ASSNAME2,
+                   ASSNAME3, ASSNAME4, ASSNAME5, BOT_ID, BOT_NAME, LOG_CLIENT,
+                   OWNER_ID, app)
+from Yukki.Core.Clients.cli import LOG_CLIENT
+from Yukki.Core.PyTgCalls.Yukki import (pytgcalls1, pytgcalls2, pytgcalls3,
+                                        pytgcalls4, pytgcalls5)
+from Yukki.Database import (get_active_chats, get_active_video_chats,
+                            get_sudoers, is_on_off, remove_active_chat,
+                            remove_active_video_chat)
+from Yukki.Inline import private_panel
+from Yukki.Plugins import ALL_MODULES
+from Yukki.Utilities.inline import paginate_modules
 
-def setting_markup2():
-    buttons = [
-        [
-            InlineKeyboardButton(text="🔈 Audio Quality", callback_data="AQ"),
-            InlineKeyboardButton(text="🎚 Audio Volume", callback_data="AV"),
-        ],
-        [
-            InlineKeyboardButton(
-                text="👥 Authorized Users", callback_data="AU"
-            ),
-            InlineKeyboardButton(
-                text="💻 Dashboard", callback_data="Dashboard"
-            ),
-        ],
-        [
-            InlineKeyboardButton(text="✖️ Close", callback_data="close"),
-        ],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
+loop = asyncio.get_event_loop()
+console = Console()
+HELPABLE = {}
+HOTTIE = "https://telegra.ph/file/58b3cdf9203431ecfce2a.jpg"
 
-
-def start_pannel():
-    if not SUPPORT_CHANNEL and not SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔧 Settings", callback_data="settingm"
-                )
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-    if not SUPPORT_CHANNEL and SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔧 Settings", callback_data="settingm"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Support Group", url=f"{SUPPORT_GROUP}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}*", buttons
-    if SUPPORT_CHANNEL and not SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔧 Settings", callback_data="settingm"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Official Channel", url=f"{SUPPORT_CHANNEL}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-    if SUPPORT_CHANNEL and SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔧 Settings", callback_data="settingm"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Official Channel", url=f"{SUPPORT_CHANNEL}"
-                ),
-                InlineKeyboardButton(
-                    text="📨Support Group", url=f"{SUPPORT_GROUP}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-
-
-def private_panel():
-    if not SUPPORT_CHANNEL and not SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "➕ Add me to your Group",
-                    url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                )
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-    if not SUPPORT_CHANNEL and SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "➕ Add me to your Group",
-                    url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Support Group", url=f"{SUPPORT_GROUP}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}*", buttons
-    if SUPPORT_CHANNEL and not SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "➕ Add me to your Group",
-                    url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Official Channel", url=f"{SUPPORT_CHANNEL}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-    if SUPPORT_CHANNEL and SUPPORT_GROUP:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    text="🗂 Helper Commands Menu", callback_data="shikhar"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "➕ Add me to your Group",
-                    url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="📨Official Channel", url=f"{SUPPORT_CHANNEL}"
-                ),
-                InlineKeyboardButton(
-                    text="📨Support Group", url=f"{SUPPORT_GROUP}"
-                ),
-            ],
-        ]
-        return f"🎛  **This is {MUSIC_BOT_NAME}**", buttons
-
-
-def setting_markup():
-    buttons = [
-        [
-            InlineKeyboardButton(text="🔈 Audio Quality", callback_data="AQ"),
-            InlineKeyboardButton(text="🎚 Audio Volume", callback_data="AV"),
-        ],
-        [
-            InlineKeyboardButton(
-                text="👥 Authorized Users", callback_data="AU"
-            ),
-            InlineKeyboardButton(
-                text="💻 Dashboard", callback_data="Dashboard"
-            ),
-        ],
-        [
-            InlineKeyboardButton(text="✖️ Close", callback_data="close"),
-            InlineKeyboardButton(text="🔙 Go Back", callback_data="okaybhai"),
-        ],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
-
-
-def volmarkup():
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text="🔄 Reset Audio Volume 🔄", callback_data="HV"
+async def initiate_bot():
+    with console.status(
+        "[magenta] Finalizing Booting...",
+    ) as status:
+        try:
+            chats = await get_active_video_chats()
+            for chat in chats:
+                chat_id = int(chat["chat_id"])
+                await remove_active_video_chat(chat_id)
+        except Exception as e:
+            pass
+        try:
+            chats = await get_active_chats()
+            for chat in chats:
+                chat_id = int(chat["chat_id"])
+                await remove_active_chat(chat_id)
+        except Exception as e:
+            pass
+        status.update(
+            status="[bold blue]Scanning for Plugins", spinner="earth"
+        )
+        console.print("Found {} Plugins".format(len(ALL_MODULES)) + "\n")
+        status.update(
+            status="[bold red]Importing Plugins...",
+            spinner="bouncingBall",
+            spinner_style="yellow",
+        )
+        for all_module in ALL_MODULES:
+            imported_module = importlib.import_module(
+                "Yukki.Plugins." + all_module
             )
-        ],
-        [
-            InlineKeyboardButton(text="🔈 Low Vol", callback_data="LV"),
-            InlineKeyboardButton(text="🔉 Medium Vol", callback_data="MV"),
-        ],
-        [
-            InlineKeyboardButton(text="🔊 High Vol", callback_data="HV"),
-            InlineKeyboardButton(text="🔈 Amplified Vol", callback_data="VAM"),
-        ],
-        [
-            InlineKeyboardButton(
-                text="🔽 Custom Volume 🔽", callback_data="Custommarkup"
+            if (
+                hasattr(imported_module, "__MODULE__")
+                and imported_module.__MODULE__
+            ):
+                imported_module.__MODULE__ = imported_module.__MODULE__
+                if (
+                    hasattr(imported_module, "__HELP__")
+                    and imported_module.__HELP__
+                ):
+                    HELPABLE[
+                        imported_module.__MODULE__.lower()
+                    ] = imported_module
+            console.print(
+                f">> [bold cyan]Successfully imported: [green]{all_module}.py"
             )
-        ],
-        [InlineKeyboardButton(text="🔙 Go back", callback_data="settingm")],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
-
-
-def custommarkup():
-    buttons = [
-        [
-            InlineKeyboardButton(text="+10", callback_data="PTEN"),
-            InlineKeyboardButton(text="-10", callback_data="MTEN"),
-        ],
-        [
-            InlineKeyboardButton(text="+25", callback_data="PTF"),
-            InlineKeyboardButton(text="-25", callback_data="MTF"),
-        ],
-        [
-            InlineKeyboardButton(text="+50", callback_data="PFZ"),
-            InlineKeyboardButton(text="-50", callback_data="MFZ"),
-        ],
-        [InlineKeyboardButton(text="🔼Custom Volume 🔼", callback_data="AV")],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
-
-
-def usermarkup():
-    buttons = [
-        [
-            InlineKeyboardButton(text="👥 Everyone", callback_data="EVE"),
-            InlineKeyboardButton(text="🙍 Admins", callback_data="AMS"),
-        ],
-        [
-            InlineKeyboardButton(
-                text="📋 Authorized Users Lists", callback_data="USERLIST"
+        console.print("")
+        status.update(
+            status="[bold blue]Importation Completed!",
+        )
+    console.print(
+        "[bold green]Congrats!! Hottie Music Bot has started successfully!\n"
+    )
+    try:
+        await app.send_photo(
+            "@Hottie_Support",
+            HOTTIE, caption="<b>Hottie Has been Started! Working Fine For Status, Click /start And /help For More Info.</b>",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                  [                  
+                       InlineKeyboardButton(
+                             text="[► Summon Me ◄]",
+                             url=f"https://t.me/Hottie_Robot?startgroup=true")
+                     ] 
+                ]
+            ),
+        ) 
+    except Exception as e:
+        print(
+            "\nBot has failed to access the log Channel. Make sure that you have added your bot to your log channel and promoted as admin!"
+        )
+        console.print(f"\n[red]Stopping Bot")
+        return
+    a = await app.get_chat_member(LOG_GROUP_ID, BOT_ID)
+    if a.status != "administrator":
+        print("Promote Bot as Admin in Logger Channel")
+        console.print(f"\n[red]Stopping Bot")
+        return
+    console.print(f"\n┌[red] Bot Started as {BOT_NAME}!")
+    console.print(f"├[green] ID :- {BOT_ID}!")
+    if STRING1 != "None":
+        try:
+            await ASS_CLI_1.join_chat("Hottie_Updates")
+            await ASS_CLI_1.join_chat("Hottie_Support")
+        except:
+            pass
+        console.print(f"├[red] Assistant 1 Started as {ASSNAME1}!")
+        console.print(f"├[green] ID :- {ASSID1}!")
+    if STRING2 != "None":
+        try:
+            await ASS_CLI_2.send_message(
+                LOG_GROUP_ID,
+                "<b>Congrats!! Assistant Client 2 has started successfully!</b>",
             )
-        ],
-        [InlineKeyboardButton(text="🔙 Go back", callback_data="settingm")],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
+        except Exception as e:
+            print(
+                "\nAssistant Account 2 has failed to access the log Channel. Make sure that you have added your Assistant to your log channel and promoted as admin!"
+            )
+            console.print(f"\n[red]Stopping Bot")
+            return
+        try:
+            await ASS_CLI_2.join_chat("Hottie_Updates")
+            await ASS_CLI_2.join_chat("Hottie_Support")
+        except:
+            pass
+        console.print(f"├[red] Assistant 2 Started as {ASSNAME2}!")
+        console.print(f"├[green] ID :- {ASSID2}!")
+    if STRING3 != "None":
+        try:
+            await ASS_CLI_3.send_message(
+                LOG_GROUP_ID,
+                "<b>Congrats!! Assistant Client 3 has started successfully!</b>",
+            )
+        except Exception as e:
+            print(
+                "\nAssistant Account 3 has failed to access the log Channel. Make sure that you have added your Assistant to your log channel and promoted as admin!"
+            )
+            console.print(f"\n[red]Stopping Bot")
+            return
+        try:
+            await ASS_CLI_3.join_chat("Hottie_Updates")
+            await ASS_CLI_3.join_chat("Hottie_Support")
+        except:
+            pass
+        console.print(f"├[red] Assistant 3 Started as {ASSNAME3}!")
+        console.print(f"├[green] ID :- {ASSID3}!")
+    if STRING4 != "None":
+        try:
+            await ASS_CLI_4.send_message(
+                LOG_GROUP_ID,
+                "<b>Congrats!! Assistant Client 4 has started successfully!</b>",
+            )
+        except Exception as e:
+            print(
+                "\nAssistant Account 4 has failed to access the log Channel. Make sure that you have added your Assistant to your log channel and promoted as admin!"
+            )
+            console.print(f"\n[red]Stopping Bot")
+            return
+        try:
+            await ASS_CLI_4.join_chat("Hottie_Updates")
+            await ASS_CLI_4.join_chat("Hottie_Support")
+        except:
+            pass
+        console.print(f"├[red] Assistant 4 Started as {ASSNAME4}!")
+        console.print(f"├[green] ID :- {ASSID4}!")
+    if STRING5 != "None":
+        try:
+            await ASS_CLI_5.send_message(
+                LOG_GROUP_ID,
+                "<b>Congrats!! Assistant Client 5 has started successfully!</b>",
+            )
+        except Exception as e:
+            print(
+                "\nAssistant Account 5 has failed to access the log Channel. Make sure that you have added your Assistant to your log channel and promoted as admin!"
+            )
+            console.print(f"\n[red]Stopping Bot")
+            return
+        try:
+            await ASS_CLI_5.join_chat("Hottie_Updates")
+            await ASS_CLI_5.join_chat("Hottie_Support")
+        except:
+            pass
+        console.print(f"├[red] Assistant 5 Started as {ASSNAME5}!")
+        console.print(f"├[green] ID :- {ASSID5}!")
+    if LOG_SESSION != "None":
+        try:
+            await LOG_CLIENT.join_chat("Hottie_Updates")
+            await LOG_CLIENT.join_chat("Hottie_Support")
+        except:
+            pass
+    console.print(f"└[red] Hottie Music Bot Boot Completed.")
+    if STRING1 != "None":
+        await pytgcalls1.start()
+    if STRING2 != "None":
+        await pytgcalls2.start()
+    if STRING3 != "None":
+        await pytgcalls3.start()
+    if STRING4 != "None":
+        await pytgcalls4.start()
+    if STRING5 != "None":
+        await pytgcalls5.start()
+    await idle()
+    console.print(f"\n[red]Stopping Bot")
 
 
-def dashmarkup():
-    buttons = [
-        [
-            InlineKeyboardButton(text="✔️ Uptime", callback_data="UPT"),
-            InlineKeyboardButton(text="💾 Ram", callback_data="RAT"),
-        ],
-        [
-            InlineKeyboardButton(text="💻 Cpu", callback_data="CPT"),
-            InlineKeyboardButton(text="💽 Disk", callback_data="DIT"),
-        ],
-        [InlineKeyboardButton(text="🔙 Go back", callback_data="settingm")],
-    ]
-    return f"🔧  **{MUSIC_BOT_NAME} Settings**", buttons
+@app.on_callback_query(filters.regex("shikhar"))
+async def shikhar(_, CallbackQuery):
+    text, keyboard = await help_parser(CallbackQuery.from_user.mention)
+    await CallbackQuery.message.edit(text, reply_markup=keyboard)
+
+
+if __name__ == "__main__":
+    loop.run_until_complete(initiate_bot())
