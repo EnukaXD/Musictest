@@ -2,6 +2,7 @@ import asyncio
 import importlib
 import os
 import re
+import random
 from Yukki.Core.Clients.cli import LOG_CLIENT
 
 from config import LOG_GROUP_ID
@@ -31,7 +32,18 @@ from Yukki.Utilities.inline import paginate_modules
 loop = asyncio.get_event_loop()
 console = Console()
 HELPABLE = {}
-
+HOTTIE = (
+    "https://telegra.ph/file/9a499fc535e1b33d9bdab.jpg",
+    "https://telegra.ph/file/c915b17643f6036c5109f.jpg",
+    "https://telegra.ph/file/3a9a5b3bbb8f3bc4ed3a6.jpg",
+    "https://telegra.ph/file/9143e55d0dc9d27d587fc.jpg",
+    "https://telegra.ph/file/91fa0e6a6d867db2b01e4.jpg",
+    "https://telegra.ph/file/d1c75a77e47ca4f1b857f.jpg",
+    "https://telegra.ph/file/7f4be5164d1998d557f12.jpg",
+    "https://telegra.ph/file/c790dc66e457626c7ba99.jpg",
+    "https://telegra.ph/file/f2939e5088ffc850f57e7.jpg",
+    "https://telegra.ph/file/12e2ea4b32664fcdbae6d.jpg",
+)
 
 async def initiate_bot():
     with console.status(
@@ -85,7 +97,19 @@ async def initiate_bot():
         "[bold green]Congrats!! Avenger Music Bot has started successfully!\n"
     )
     try:
-        await app.send_message(LOG_GROUP_ID,"<b>Congrats!! Music Bot has started successfully!</b>",)
+        await app.send_photo(
+            "@Hottie_Support",
+            random.choice(HOTTIE), caption="<b>Hottie Has been Started! Working Fine For Status, Click /start And /help For More Info.</b>",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                  [                  
+                       InlineKeyboardButton(
+                             text="[► Summon Me ◄]",
+                             url=f"https://t.me/Hottie_Robot?startgroup=true")
+                     ] 
+                ]
+            ),
+        ) 
     except Exception as e:
         print("\nBot has failed to access the log Channel. Make sure that you have added your bot to your log channel and promoted as admin!")
         console.print(f"\n[red]Stopping Bot")
