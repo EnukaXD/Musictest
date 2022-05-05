@@ -104,3 +104,9 @@ Special thanks to these amazing projects/people which/who help power Yukki Music
 - [CallsMusic Team](https://github.com/Callsmusic)
 - [TheHamkerCat](https://github.com/TheHamkerCat)
 - [Charon Baglari](https://github.com/XCBv021)
+
+
+### Deploy To Heroku 📡</h4>
+
+<p align="center"><a href="https://heroku.com/deploy?template=https://github.com/ThePachirisu/Musictest"> <img src="https://img.shields.io/badge/Deploy%20To%20Heroku-blueviolet?style=for-the-badge&logo=heroku" width="210" height="34.45"/></a></p>
+A
